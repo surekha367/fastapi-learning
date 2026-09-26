@@ -72,3 +72,21 @@ def get_order(category:str|None = None,
     FastAPI can validate query parameters based on Python type annotations.
     suppose price type is float i gave string value. /order?price=abc  fastapi cannot convert str to float so it return a validation error 422 unprocessable entity ( 127.0.0.1:64715 - "GET /order?category=laptop&brand=HP&price=abc HTTP/1.1" 422 Unprocessable Entity)
 """
+
+#Required vs Optional parameters
+# Required parameters
+@app.get("/order")
+def get_orders(category:str):
+    return {"category":category}
+# there is no default value so category need to be required value. if not provide then it will give validation error.
+
+#optional parameters
+@app.get("/order")
+def get_item(category:str | None = None):
+    return {"category":category}
+
+"""
+    if we didn't provide any value then it will consider as None it wont provide any validation error.we can provide default value as well like category:str = "laptop"
+"""
+
+# Pagination related query parameters  GET /products?page=2&limit=50 it means page no is 2 and limit per page is 50
