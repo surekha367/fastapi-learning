@@ -90,3 +90,91 @@ def get_item(category:str | None = None):
 """
 
 # Pagination related query parameters  GET /products?page=2&limit=50 it means page no is 2 and limit per page is 50
+
+
+"""
+    Path parameter, Query parameter, Request body
+    Path parameter → identifies something in the URL
+    Query parameter → provides filtering/options in the URL
+    Request body → sends structured data inside the HTTP request itself
+    Why do we need a request body?
+    Imagine we want to create a new product.
+    The product has:name,price, category, description, quantity
+    We could technically put everything into the URL:
+    /products?name=Dell&price=55000&category=laptop&quantity=5
+    But that's not a good design for a large amount of structured data.
+    Instead, we normally send:
+    POST /products
+    with a body such as:
+    {
+        "name":"Dell",
+        "price":55000,
+        "category":"laptop",
+        "quantity":5
+    }
+
+    An HTTP request can contain several parts.
+    ex: POST /products HTTP/1.1
+        HOST example.com
+        Content-Type: application/json
+
+        {
+            "name":"Dell",
+            "price":55000
+        }
+
+        POST /products HTTP/1.1
+        this tells server -> method = POST, path = /products
+
+        Headers -> Content-Type: application/json  this tells server The body contains JSON data.
+
+        Body ->  {"name": "Dell Laptop",
+                  "price": 55000
+                 }
+        JSON is a data format commonly used for APIs.This represents an object containing key-value pairs.JSON is not Python. but it looks like python dictionary.
+
+        How does FastAPI receive this JSON?
+        This is where Pydantic becomes important.we create models 
+"""
+
+from pydantic import BaseModel
+
+class Product(BaseModel):
+    name: str
+    price: float
+    category:str
+#this model describes how a product should look like.it says a product must have values like name,price and category and these values should have these types.
+"""
+    FastAPI uses Pydantic extensively for data validation and serialization.
+"""
+
+@app.post("/products")
+def create_products(product:Product): #this tells fastapi Read the request body and validate it according to the Product model.
+    return {"name":product.name, 
+            "price":product.price,
+            "category":product.category}
+#product is a pydantic model instance.
+
+# path,query parameter and request body
+class productUpdate(BaseModel):
+    price:float
+    category:str
+
+@app.patch("/product/{product_id}")
+def update_product(product_id:int,
+                   notify:bool = False,
+                   product:productUpdate = None):
+    return {"product id":product_id, "notification of products":notify, "price":product.price,"category":product.category}
+
+#Response Model ->is about What our API returns to the client.
+class ProductResponse(BaseModel):
+    id:int
+    category:str
+    price:float
+
+@app.get("/prod/{product_id}",response_model=ProductResponse)
+def get_prods(product_id:int):
+    return {"id":product_id,
+            "category":"Laptop",
+            "price":45000.245,
+            "reviews_rating":4.2}
