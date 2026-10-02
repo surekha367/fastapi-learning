@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 
 app = FastAPI()
@@ -38,3 +38,35 @@ def create_product(product: ProductCreate):
         ↓
     10. Client receives JSON
 """
+
+# HTTP Exception
+@app.get("/products/{product_id}")
+def get_products(product_id: int):
+    if product_id == 923:   #if we use db then we dont need to hardcode the id value
+        raise HTTPException(status_code=404,detail="product not found")
+
+    return product_id
+
+# raise is used to stop processing this request and send an HTTP error response
+
+# in-memory product api
+
+products = {
+    1:{
+        "id": 1,
+        "name": "AC",
+        "price": 35000
+    },
+    2:{
+        "id":2,
+        "name": "mobile",
+        "price": 56000
+    }
+}
+
+@app.get("/product/{product_id}")
+def get_product(product_id: int):
+    if product_id not in products:
+        raise HTTPException(status_code=404,detail="products not found")
+
+    return products[product_id]
