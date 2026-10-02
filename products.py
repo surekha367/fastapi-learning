@@ -70,3 +70,22 @@ def get_product(product_id: int):
         raise HTTPException(status_code=404,detail="products not found")
 
     return products[product_id]
+
+class UserCreate(BaseModel):
+    name: str
+    age: int
+
+users = {}
+user_id = 1
+@app.post("/users")
+def create_user(user: UserCreate):
+    global user_id
+
+    users[user_id] = {
+        "user_id":user_id,
+        "name":user.name,
+        "age":user.age
+    }
+    user_id += 1
+
+    return users[user_id-1]
