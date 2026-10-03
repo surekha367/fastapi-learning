@@ -71,21 +71,39 @@ def get_product(product_id: int):
 
     return products[product_id]
 
+
+#CRUD Operations
+# Create (POST)
 class UserCreate(BaseModel):
+    name: str
+    age: int
+
+class UserResponse(BaseModel):
+    user_id: int
     name: str
     age: int
 
 users = {}
 user_id = 1
-@app.post("/users")
+
+@app.post("/users", response_model=UserResponse)
 def create_user(user: UserCreate):
     global user_id
-
-    users[user_id] = {
+    current_user_id = user_id
+    users[current_user_id] = {
         "user_id":user_id,
         "name":user.name,
         "age":user.age
     }
     user_id += 1
 
-    return users[user_id-1]
+    return users[current_user_id]
+
+# Read (GET)
+@app.get("/users")
+def get_users():
+    return users
+
+@app.get("/users", response_model=list[UserResponse])
+def get_all_users():
+    return list(users.values())
