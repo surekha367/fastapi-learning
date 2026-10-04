@@ -160,3 +160,12 @@ def update_user_field(user_id: int, user: UpdateUserField):
     users[user_id].update(update_user)
 
     return users[user_id]
+
+# DELETE (remove)
+@app.delete("/users/{user_id}")
+def delete_user(user_id: int):
+    if user_id not in users:
+        raise HTTPException(status_code=404,detail="user not found")
+
+    del users[user_id]
+    return users
