@@ -99,7 +99,7 @@ def create_user(user: UserCreate):
 
     return users[current_user_id]
 
-# Read (GET)
+# Read all users(GET)
 @app.get("/users")
 def get_users():
     return users
@@ -107,3 +107,56 @@ def get_users():
 @app.get("/users", response_model=list[UserResponse])
 def get_all_users():
     return list(users.values())
+
+#Read one user (GET)
+@app.get("/users/{user_id}", response_model=UserResponse)
+def get_user(user_id: int):
+    if user_id not in users:
+        raise HTTPException(status_code=404, detail="user not found")
+    
+    return users[user_id]
+
+#Update PUT & PATCH
+
+"""
+    There are two important HTTP methods for updates:
+    PUT → replace the resource
+    PATCH → partially modify the resource
+"""
+
+class UpdateUser(BaseModel):
+    name: str
+    age: int
+
+@app.put("/users/{user_id}", response_model=UserResponse)
+def update_user(user_id: int, user: UpdateUser):
+    if user_id not in users:
+        raise HTTPException(status_code=404, detail="user not found")
+
+    users[user_id] = {
+        "user_id":user_id,
+        "name": user.name,
+        "age": user.age
+    }
+    return users[user_id]
+
+@app.patch("/users")
+def update_all_users():
+    for user in users.values():
+        print(user)
+        print(users.values())
+        user["age"] = 14
+    return users
+
+class UpdateUserField(BaseModel):
+    name: str| None = None
+    age: int| None = None
+
+@app.patch("/users/{user_id}", response_model=UserResponse)
+def update_user_field(user_id: int, user: UpdateUserField):
+    if user_id not in users:
+        raise HTTPException(status_code=404, detail="user id not found")
+    update_user = user.model_dump(exclude_unset=True)
+    users[user_id].update(update_user)
+
+    return users[user_id]
