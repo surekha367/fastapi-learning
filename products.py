@@ -162,10 +162,13 @@ def update_user_field(user_id: int, user: UpdateUserField):
     return users[user_id]
 
 # DELETE (remove)
-@app.delete("/users/{user_id}")
+@app.delete("/users/{user_id}",status_code=204)
 def delete_user(user_id: int):
     if user_id not in users:
         raise HTTPException(status_code=404,detail="user not found")
-
+    deleted_user = users[user_id]
     del users[user_id]
-    return users
+    # return {"message":"user deleted successfully"}
+    #we are using 204 status it means no content (no response body) then we shouldn't return anything
+    #if we want to return deleted user details then before deleting we need to store and need to return that value.commented return bcoz using 204 status
+    #return deleted_user  
