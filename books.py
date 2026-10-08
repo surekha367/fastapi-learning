@@ -53,3 +53,13 @@ def get_book_by_path_query_parameter(author:str, category: str):
 def create_book(new_book=Body()):
     books.append(new_book)
     return new_book
+
+@app.put("/books/update_book")
+def update_book_details(updated_book = Body()):
+    for i in range(len(books)):
+        if books[i].get('book_name').casefold() == updated_book.get('book_name').casefold():
+            books[i] = updated_book
+
+    return books
+
+# https://chatgpt.com/share/6ac642e0-2e78-83ee-9531-cf9d8e85ce29
